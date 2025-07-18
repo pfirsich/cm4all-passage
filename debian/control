@@ -12,6 +12,7 @@ Build-Depends: debhelper (>= 13.3~),
  libsodium-dev (>= 1.0.16),
  libsystemd-dev,
  libluajit-5.1-dev,
+ libsodium-dev,
  libgtest-dev,
  python3-sphinx
 Standards-Version: 4.0.0
