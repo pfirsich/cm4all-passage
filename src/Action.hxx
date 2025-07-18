@@ -30,6 +30,7 @@ struct Action {
 #ifdef HAVE_CURL
 		HTTP_REQUEST,
 #endif
+		FLUSH_CDN_CACHE,
 	};
 
 	std::map<std::string, std::string, std::less<>> response_headers;

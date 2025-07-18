@@ -1,6 +1,6 @@
 cm4all-passage (0.26) unstable; urgency=low
 
-  * 
+  * lua: add flush_cdn_cache command
 
  --   
 

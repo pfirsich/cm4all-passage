@@ -10,6 +10,7 @@
 #include "Action.hxx"
 #include "SendControl.hxx"
 #include "ExecPipe.hxx"
+#include "CdnProxySend.hxx"
 #include "lua/Error.hxx"
 #include "io/Iovec.hxx"
 #include "io/UniqueFileDescriptor.hxx"
@@ -212,7 +213,21 @@ PassageConnection::Do(SocketAddress address, const Action &action)
 
 			SendResponse(address, "OK", result.stdout_pipe, result.stderr_pipe);
 		}
+		break;
 
+	case Action::Type::FLUSH_CDN_CACHE:
+		{
+			FlushHttpCache(action.address, action.param.c_str());
+			auto it = action.args.begin();
+			assert(it != action.args.end());
+			const auto proxy_address = (it++)->c_str();
+			assert(it != action.args.end());
+			const auto pillar = (it++)->c_str();
+			assert(it != action.args.end());
+			const auto account_id = (it++)->c_str();
+			assert(it == action.args.end());
+			CdnProxySend(proxy_address, pillar, account_id);
+		}
 		break;
 
 #ifdef HAVE_CURL

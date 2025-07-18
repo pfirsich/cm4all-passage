@@ -381,6 +381,36 @@ try {
 
 #endif // HAVE_CURL
 
+static int NewFlushCdnCacheAction(lua_State* L)
+{
+	// cdn_invalidate_cache(request, control_address, flush_http_cache_tag, cdn_proxy_address, pillar, account_id)
+	const auto top = lua_gettop(L);
+	if (top != 6) {
+		return luaL_error(L, "Invalid number of parameters");
+	}
+
+	AllocatedSocketAddress control_address;
+	try {
+		control_address = Lua::ToSocketAddress(L, 2, BengControl::DEFAULT_PORT);
+	} catch (const std::exception &e) {
+		return luaL_error(L, e.what());
+	}
+
+	const char *flush_http_cache_tag = luaL_checkstring(L, 3);
+	const char *cdn_proxy_address = luaL_checkstring(L, 4);
+	const char *pillar = luaL_checkstring(L, 5);
+	const char *account_id = luaL_checkstring(L, 6);
+
+	auto &action = *NewLuaAction(L, 1);
+	action.type = Action::Type::FLUSH_CDN_CACHE;
+	action.address = std::move(control_address);
+	action.param = flush_http_cache_tag;
+	action.args.push_front(account_id);
+	action.args.push_front(pillar);
+	action.args.push_front(cdn_proxy_address);
+	return 1;
+}
+
 static constexpr struct luaL_Reg request_methods [] = {
 	{"error", NewErrorAction},
 	{"fade_children", NewFadeChildrenAction},
@@ -390,6 +420,7 @@ static constexpr struct luaL_Reg request_methods [] = {
 	{"http_request", NewHttpRequestAction},
 	{"http_get", NewHttpRequestAction}, // pre 0.25 legacy
 #endif
+	{"flush_cdn_cache", NewFlushCdnCacheAction},
 	{nullptr, nullptr}
 };
 
